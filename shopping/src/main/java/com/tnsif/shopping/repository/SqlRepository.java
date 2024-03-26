@@ -1,0 +1,9 @@
+package com.tnsif.shopping.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.tnsif.shopping.model.User;
+
+public interface SqlRepository extends JpaRepository<User,Integer> {
+
+}

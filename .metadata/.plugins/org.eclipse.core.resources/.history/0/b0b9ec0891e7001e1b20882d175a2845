@@ -1,0 +1,70 @@
+package com.tnsif.shopping.controller;
+import com.tnsif.shopping.model.*;
+import com.tnsif.shopping.repository.SqlRepository;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ControllerClass {
+ 
+	@Autowired
+	SqlRepository sqlrepository;
+	
+	@GetMapping("/user-list/{id}")
+	public User getUsers(@PathVariable("id") Integer id)
+	{
+		return sqlrepository.findById(id).get();
+	}	
+	@DeleteMapping("/delete-user/{id}")
+	
+	public String deleteUser(@PathVariable("id") Integer id) {
+	
+		if(!sqlrepository.findById(id).equals(Optional.empty())) {
+			sqlrepository.deleteById(id);
+			return "The id " + id + " is deleted.";
+		}
+		return "The id " + id +" does not exists.";
+		
+	}
+	@PutMapping("/update-user/{id}")
+	public User updateUser(@PathVariable("id") Integer id,@RequestBody Map<String, String> userdetails) {
+	
+		User current = sqlrepository.findById(id).get();
+		current.setUsername(userdetails.get("username"));
+		current.setEmail(userdetails.get("email"));
+		current.setPassword(userdetails.get("password"));
+		
+		 sqlrepository.save(current);
+		return current;
+	}
+	
+	@PostMapping("/add-user")
+	public User addUser(@RequestBody Map<String,String> userdetails) {
+		String userName = userdetails.get("userName");
+		int userId = Integer.parseInt(userdetails.get("userId"));
+		String email = userdetails.get("email");
+		String password = userdetails.get("password");
+		
+		User newUser =  new User(userName,userId,email,password);
+		return sqlrepository.save(newUser);
+
+	}
+}
+
+
+
+
+

@@ -1,0 +1,71 @@
+package com.tnsif.shopping.controller;
+import com.tnsif.shopping.model.*;
+import com.tnsif.shopping.repository.SqlRepository;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/shopping")
+@CrossOrigin(origins = "http://localhost:4200/")
+public class ControllerClass {
+ 
+	@Autowired
+	SqlRepository sqlrepository;
+	
+	@GetMapping
+	public List<User> getUsers(){
+		return sqlrepository.findAll();
+	}
+	
+	@GetMapping("/{id}")
+	public User getUsersById(@PathVariable("id") Integer id,@RequestBody User user)
+	{
+		return sqlrepository.findById(id).get();
+	}	
+	
+	
+	@DeleteMapping("/{id}")
+	public String deleteUser(@PathVariable("id") Integer id) {
+	
+		if(!sqlrepository.findById(id).equals(Optional.empty())) {
+			sqlrepository.deleteById(id);
+			return "The id " + id + " is deleted.";
+		}
+		return "The id " + id +" does not exists.";
+		
+	}
+	@PutMapping("/{id}")
+	public User updateUser(@PathVariable("id") Integer id,@RequestBody User userdetails) {
+	
+		userdetails.setId(id);
+		return sqlrepository.save(userdetails)
+		
+	}
+	
+	@PostMapping
+	public User addUser(@RequestBody User user) {
+		
+		return sqlrepository.save(user);
+
+	}
+}
+
+
+
+
+
